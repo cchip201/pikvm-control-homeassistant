@@ -107,7 +107,7 @@ class PiKVMClient:
     async def get_system_info(self) -> dict:
         """Fetch general system, hw, and fan information from /api/info."""
         url = f"{self._host}/api/info"
-        params = {"fields": "hw,system,fan"}
+        params = {"fields": "hw,system,fan,extras,meta,auth"}
         try:
             async with self._session.get(
                 url,

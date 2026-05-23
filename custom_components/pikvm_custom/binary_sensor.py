@@ -100,13 +100,58 @@ class PiKVMBinarySensor(CoordinatorEntity[PiKVMDataUpdateCoordinator], BinarySen
         """Return true if binary sensor is on."""
         if not self.coordinator.data:
             return None
-        
-        # Resolve nested properties dynamically
+
+        info = self.coordinator.data.get("info", {})
+
+        # Throttling robust resolver
+        if self._unique_id_suffix == "throttled":
+            hw = info.get("hw", {})
+            health = hw.get("health", {})
+            throttling = health.get("throttling", {})
+            raw_flags = throttling.get("raw_flags")
+            if raw_flags is not None:
+                return raw_flags > 0
+            throttled = throttling.get("throttled")
+            if throttled is not None:
+                return bool(throttled)
+            if "throttled" in hw:
+                return bool(hw["throttled"])
+
+        # Services robust resolver
+        if self._unique_id_suffix.startswith("service_"):
+            service_key = self._unique_id_suffix.replace("service_", "")
+
+            # Check the "extras" list first (real hardware)
+            extras = info.get("extras")
+            if isinstance(extras, list):
+                for item in extras:
+                    if not isinstance(item, dict):
+                        continue
+                    daemon = item.get("daemon", "")
+                    if daemon in (f"kvmd-{service_key}", service_key):
+                        started = item.get("started")
+                        if started is not None:
+                            return bool(started)
+
+            # Fallback to nested dict "system" -> "services" (mock/offline tests)
+            services = info.get("system", {}).get("services", {})
+            service_data = services.get(service_key)
+            if isinstance(service_data, dict):
+                active = service_data.get("active")
+                if active is not None:
+                    return bool(active)
+            elif service_data is not None:
+                return bool(service_data)
+
+        # Standard Fallback Path Resolution
         val = self.coordinator.data
         for key in self._data_path:
             if not isinstance(val, dict):
                 return None
             val = val.get(key)
+
+        if val is None:
+            return None
         return bool(val)
 
     @property

@@ -96,6 +96,36 @@ class PiKVMSensor(CoordinatorEntity[PiKVMDataUpdateCoordinator], SensorEntity):
         if not self.coordinator.data:
             return None
         
+        info = self.coordinator.data.get("info", {})
+        
+        # CPU Temperature Robust Resolver
+        if self._unique_id_suffix == "cpu_temp":
+            cpu_temp = info.get("hw", {}).get("health", {}).get("temp", {}).get("cpu")
+            if cpu_temp is not None:
+                return cpu_temp
+            cpu_temp = info.get("fan", {}).get("state", {}).get("temp", {}).get("real")
+            if cpu_temp is not None:
+                return cpu_temp
+            cpu_temp = info.get("hw", {}).get("temp", {}).get("cpu")
+            if cpu_temp is not None:
+                return cpu_temp
+                
+        # Fan Speed Robust Resolver
+        if self._unique_id_suffix == "fan_speed":
+            speed_pct = info.get("fan", {}).get("state", {}).get("fan", {}).get("speed")
+            if speed_pct is not None:
+                self._attr_native_unit_of_measurement = "%"
+                return speed_pct
+            rpm = info.get("fan", {}).get("state", {}).get("hall", {}).get("rpm")
+            if rpm is not None and rpm > 0:
+                self._attr_native_unit_of_measurement = "RPM"
+                return rpm
+            mock_speed = info.get("fan", {}).get("speed")
+            if mock_speed is not None:
+                self._attr_native_unit_of_measurement = "RPM"
+                return mock_speed
+
+        # Standard Fallback Path Resolution
         val = self.coordinator.data
         for key in self._data_path:
             if not isinstance(val, dict):
@@ -120,10 +150,22 @@ class PiKVMTimestampSensor(PiKVMSensor):
     @property
     def native_value(self) -> str | None:
         """Return boot timestamp value."""
-        uptime_seconds = super().native_value
-        if uptime_seconds is None or not isinstance(uptime_seconds, (int, float)):
+        if not self.coordinator.data:
             return None
-        
+            
+        info = self.coordinator.data.get("info", {})
+        uptime_seconds = info.get("fan", {}).get("state", {}).get("service", {}).get("now_ts")
+        if uptime_seconds is None:
+            uptime_seconds = info.get("system", {}).get("uptime")
+            
+        if uptime_seconds is None:
+            return None
+            
+        try:
+            uptime_seconds = float(uptime_seconds)
+        except (ValueError, TypeError):
+            return None
+            
         # Calculate boot time relative to current UTC time
         boot_time = dt_util.utcnow() - timedelta(seconds=uptime_seconds)
         return boot_time
