@@ -134,6 +134,13 @@ class PiKVMSensor(CoordinatorEntity[PiKVMDataUpdateCoordinator], SensorEntity):
         return val
 
     @property
+    def extra_state_attributes(self) -> dict | None:
+        """Return the state attributes."""
+        if self._unique_id_suffix == "cpu_temp":
+            return {"raw_info": self.coordinator.data.get("info")}
+        return None
+
+    @property
     def device_info(self) -> DeviceInfo:
         """Return device details."""
         return DeviceInfo(
