@@ -18,6 +18,31 @@ mock_state = {
     }
 }
 
+mock_info = {
+    "hw": {
+        "temp": {
+            "cpu": 42.5
+        },
+        "throttled": False
+    },
+    "fan": {
+        "speed": 2200,
+        "enabled": True
+    },
+    "system": {
+        "uptime": 3600.0,
+        "kvmd": {
+            "version": "v3.123"
+        },
+        "services": {
+            "ipmi": {"active": True},
+            "janus": {"active": True},
+            "vnc": {"active": False},
+            "webterm": {"active": True}
+        }
+    }
+}
+
 class MockPiKVMHandler(BaseHTTPRequestHandler):
     """Handler for PiKVM mock endpoints."""
 
@@ -44,6 +69,12 @@ class MockPiKVMHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             response = {"ok": True, "result": mock_state}
+            self.wfile.write(json.dumps(response).encode("utf-8"))
+        elif parsed_path.path == "/api/info":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            response = {"ok": True, "result": mock_info}
             self.wfile.write(json.dumps(response).encode("utf-8"))
         else:
             self.send_response(404)

@@ -44,8 +44,12 @@ async def test_flow() -> None:
         off_state = await client.get_atx_state()
         print(f"   Off State: {off_state}")
 
+        print("\n8. Fetching Advanced System Diagnostics (/api/info)...")
+        info = await client.get_system_info()
+        print(f"   System Info: {info}")
+
         # Test auth error handling
-        print("\n8. Testing Client Auth Failure Handling...")
+        print("\n9. Testing Client Auth Failure Handling...")
         bad_client = PiKVMClient(host=host, username="admin", password="wrongpassword")
         try:
             await bad_client.check_connection()

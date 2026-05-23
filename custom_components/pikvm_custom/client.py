@@ -103,3 +103,25 @@ class PiKVMClient:
                 return data.get("ok", False)
         except aiohttp.ClientError as err:
             raise PiKVMConnectionError(f"Network error calling power action {action}: {err}") from err
+
+    async def get_system_info(self) -> dict:
+        """Fetch general system, hw, and fan information from /api/info."""
+        url = f"{self._host}/api/info"
+        params = {"fields": "hw,system,fan"}
+        try:
+            async with self._session.get(
+                url,
+                auth=self._auth,
+                params=params,
+                ssl=self._verify_ssl,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as response:
+                if response.status in (401, 403):
+                    raise PiKVMAuthError("Invalid credentials.")
+                response.raise_for_status()
+                data = await response.json()
+                _LOGGER.debug("PiKVM system info payload: %s", data)
+                return data.get("result", {})
+        except aiohttp.ClientError as err:
+            raise PiKVMConnectionError(f"Network error getting system info: {err}") from err
+

@@ -25,6 +25,11 @@ class PiKVMDataUpdateCoordinator(DataUpdateCoordinator[dict]):
     async def _async_update_data(self) -> dict:
         """Fetch data from PiKVM."""
         try:
-            return await self.client.get_atx_state()
+            atx_state = await self.client.get_atx_state()
+            system_info = await self.client.get_system_info()
+            return {
+                "atx": atx_state,
+                "info": system_info,
+            }
         except PiKVMClientError as err:
             raise UpdateFailed(f"Error communicating with PiKVM: {err}") from err

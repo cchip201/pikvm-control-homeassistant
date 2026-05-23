@@ -25,8 +25,41 @@ async def async_setup_entry(
     host: str = entry.data[CONF_HOST]
 
     sensors = [
-        PiKVMBinarySensor(coordinator, entry, host, "power", "Power LED", BinarySensorDeviceClass.POWER),
-        PiKVMBinarySensor(coordinator, entry, host, "hdd", "HDD LED", BinarySensorDeviceClass.RUNNING),
+        # Physical LEDs from ATX State
+        PiKVMBinarySensor(
+            coordinator, entry, host, "Power LED", "power_led",
+            ["atx", "leds", "power"], BinarySensorDeviceClass.POWER
+        ),
+        PiKVMBinarySensor(
+            coordinator, entry, host, "HDD LED", "hdd_led",
+            ["atx", "leds", "hdd"], BinarySensorDeviceClass.RUNNING
+        ),
+        # Hardware Throttling State
+        PiKVMBinarySensor(
+            coordinator, entry, host, "Throttling Alert", "throttled",
+            ["info", "hw", "throttled"], BinarySensorDeviceClass.PROBLEM
+        ),
+        # Services Statuses
+        PiKVMBinarySensor(
+            coordinator, entry, host, "IPMI Service", "service_ipmi",
+            ["info", "system", "services", "ipmi", "active"],
+            BinarySensorDeviceClass.RUNNING, "mdi:server"
+        ),
+        PiKVMBinarySensor(
+            coordinator, entry, host, "Janus WebRTC Service", "service_janus",
+            ["info", "system", "services", "janus", "active"],
+            BinarySensorDeviceClass.RUNNING, "mdi:webrtc"
+        ),
+        PiKVMBinarySensor(
+            coordinator, entry, host, "VNC Service", "service_vnc",
+            ["info", "system", "services", "vnc", "active"],
+            BinarySensorDeviceClass.RUNNING, "mdi:screencast"
+        ),
+        PiKVMBinarySensor(
+            coordinator, entry, host, "Webterm Service", "service_webterm",
+            ["info", "system", "services", "webterm", "active"],
+            BinarySensorDeviceClass.RUNNING, "mdi:console-line"
+        ),
     ]
 
     async_add_entities(sensors)
@@ -41,30 +74,40 @@ class PiKVMBinarySensor(CoordinatorEntity[PiKVMDataUpdateCoordinator], BinarySen
         coordinator: PiKVMDataUpdateCoordinator,
         entry: ConfigEntry,
         host: str,
-        led_key: str,
         name: str,
+        unique_id_suffix: str,
+        data_path: list[str],
         device_class: BinarySensorDeviceClass | None = None,
+        icon: str | None = None,
     ) -> None:
         """Initialize the binary sensor."""
         super().__init__(coordinator)
         self._entry = entry
         self._host = host
-        self._led_key = led_key
         self._attr_name = name
+        self._unique_id_suffix = unique_id_suffix
+        self._data_path = data_path
         self._attr_device_class = device_class
+        self._attr_icon = icon
 
     @property
     def unique_id(self) -> str:
         """Return unique ID."""
-        return f"{self._entry.entry_id}_{self._led_key}_led"
+        return f"{self._entry.entry_id}_{self._unique_id_suffix}"
 
     @property
     def is_on(self) -> bool | None:
         """Return true if binary sensor is on."""
         if not self.coordinator.data:
             return None
-        leds = self.coordinator.data.get("leds", {})
-        return bool(leds.get(self._led_key, False))
+        
+        # Resolve nested properties dynamically
+        val = self.coordinator.data
+        for key in self._data_path:
+            if not isinstance(val, dict):
+                return None
+            val = val.get(key)
+        return bool(val)
 
     @property
     def device_info(self) -> DeviceInfo:
