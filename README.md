@@ -1,4 +1,4 @@
-# PiKVM Custom Controls for Home Assistant
+# PiKVM Control Home Assistant
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![HA_Version](https://img.shields.io/badge/Home%20Assistant-2026.3+-blue.svg?style=for-the-badge)](https://github.com/home-assistant/core)
@@ -44,7 +44,7 @@ Track sub-services and physical server states:
    https://github.com/cchip201/pikvm-control-homeassistant
    ```
 4. Select Category **Integration** and click **Add**.
-5. Find **PiKVM Custom Controls** in the store, click **Download**, and restart Home Assistant.
+5. Find **PiKVM Control Home Assistant** in the store, click **Download**, and restart Home Assistant.
 
 ### Method 2: Manual Installation
 1. Download the latest release from the [Releases](https://github.com/cchip201/pikvm-control-homeassistant/releases) page.
@@ -57,7 +57,7 @@ Track sub-services and physical server states:
 
 1. In Home Assistant, navigate to **Settings** > **Devices & Services**.
 2. Click **+ Add Integration** in the bottom-right corner.
-3. Search for and select **PiKVM Custom Controls**.
+3. Search for and select **PiKVM Control Home Assistant**.
 4. Fill in the connection form:
    *   **Host**: IP address or hostname of your PiKVM device (e.g., `192.168.1.150` or `pikvm.local`).
    *   **Username**: Your KVMD web interface username (default: `admin`).

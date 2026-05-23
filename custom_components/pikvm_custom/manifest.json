@@ -1,11 +1,11 @@
 {
   "domain": "pikvm_custom",
-  "name": "PiKVM Custom Controls",
+  "name": "PiKVM Control Home Assistant",
   "codeowners": ["@cchip201"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/cchip201/pikvm-control-homeassistant",
   "iot_class": "local_polling",
   "requirements": ["aiohttp>=3.8.1"],
-  "version": "2.0.0"
+  "version": "2.0.1"
 }

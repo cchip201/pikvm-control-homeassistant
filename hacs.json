@@ -1,5 +1,5 @@
 {
-  "name": "PiKVM Custom Controls",
+  "name": "PiKVM Control Home Assistant",
   "render_readme": true,
   "homeassistant": "2026.3.0"
 }
