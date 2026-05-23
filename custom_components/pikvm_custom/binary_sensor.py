@@ -121,9 +121,23 @@ class PiKVMBinarySensor(CoordinatorEntity[PiKVMDataUpdateCoordinator], BinarySen
         if self._unique_id_suffix.startswith("service_"):
             service_key = self._unique_id_suffix.replace("service_", "")
 
-            # Check the "extras" list first (real hardware)
+            # Check the "extras" object/list (real hardware)
             extras = info.get("extras")
-            if isinstance(extras, list):
+            if isinstance(extras, dict):
+                service_data = extras.get(service_key)
+                if isinstance(service_data, dict):
+                    started = service_data.get("started")
+                    if started is not None:
+                        return bool(started)
+                # Fallback to search by daemon name inside dictionary values
+                for key, val in extras.items():
+                    if isinstance(val, dict):
+                        daemon = val.get("daemon", "")
+                        if daemon in (f"kvmd-{service_key}", service_key):
+                            started = val.get("started")
+                            if started is not None:
+                                return bool(started)
+            elif isinstance(extras, list):
                 for item in extras:
                     if not isinstance(item, dict):
                         continue
