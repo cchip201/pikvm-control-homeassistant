@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configure PiKVM Custom Controls",
+        "description": "Enter the IP or hostname and authentication details for your PiKVM.",
+        "data": {
+          "host": "Host/IP Address",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify SSL Certificate"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect, please check host IP and network connectivity.",
+      "invalid_auth": "Authentication failed, please check username and password.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    }
+  }
+}

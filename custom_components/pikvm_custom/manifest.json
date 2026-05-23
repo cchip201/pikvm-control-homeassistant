@@ -1,0 +1,11 @@
+{
+  "domain": "pikvm_custom",
+  "name": "PiKVM Custom Controls",
+  "codeowners": ["@cchip201"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/cchip201/pikvm-custom",
+  "iot_class": "local_polling",
+  "requirements": ["aiohttp>=3.8.1"],
+  "version": "1.0.0"
+}
