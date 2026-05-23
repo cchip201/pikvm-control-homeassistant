@@ -3,10 +3,10 @@ import asyncio
 import os
 import sys
 
-# Ensure custom_components directory is in path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "custom_components")))
+# Ensure pikvm_custom directory is in path for direct import to bypass HA package dependency
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "custom_components", "pikvm_custom")))
 
-from pikvm_custom.client import PiKVMClient, PiKVMAuthError, PiKVMConnectionError
+from client import PiKVMClient, PiKVMAuthError, PiKVMConnectionError
 
 async def test_flow() -> None:
     """Test entire client API flow against local mock server."""
