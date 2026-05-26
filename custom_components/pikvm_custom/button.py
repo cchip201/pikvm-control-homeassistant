@@ -27,6 +27,7 @@ async def async_setup_entry(
         PiKVMClickButton(client, entry, host, "power", "Power Click", "mdi:power"),
         PiKVMClickButton(client, entry, host, "reset", "Reset Click", "mdi:restart"),
         PiKVMPowerActionButton(client, entry, host, "off_hard", "Power Long Press (Hard Off)", "mdi:power-cycle"),
+        PiKVMSystemRebootButton(client, entry, host, "Reboot PiKVM", "mdi:restart-alert"),
     ]
 
     async_add_entities(buttons)
@@ -108,3 +109,23 @@ class PiKVMPowerActionButton(PiKVMButtonBase):
         """Handle button press."""
         _LOGGER.debug("Triggering power action: %s", self._action)
         await self._client.set_power_action(self._action)
+
+class PiKVMSystemRebootButton(PiKVMButtonBase):
+    """Button to reboot the PiKVM system itself."""
+
+    def __init__(
+        self,
+        client: PiKVMClient,
+        entry: ConfigEntry,
+        host: str,
+        name: str,
+        icon: str,
+    ) -> None:
+        """Initialize reboot button."""
+        super().__init__(client, entry, host, name, icon)
+
+    async def async_press(self) -> None:
+        """Handle button press."""
+        _LOGGER.debug("Triggering PiKVM system reboot")
+        await self._client.reboot_system()
+

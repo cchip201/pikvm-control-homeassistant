@@ -125,3 +125,65 @@ class PiKVMClient:
         except aiohttp.ClientError as err:
             raise PiKVMConnectionError(f"Network error getting system info: {err}") from err
 
+    async def reboot_system(self) -> bool:
+        """Reboot the PiKVM system via Redfish API."""
+        url = f"{self._host}/api/redfish/v1/Systems/0/Actions/ComputerSystem.Reset"
+        payload = {"ResetType": "ForceRestart"}
+        try:
+            async with self._session.post(
+                url,
+                auth=self._auth,
+                json=payload,
+                ssl=self._verify_ssl,
+                timeout=aiohttp.ClientTimeout(total=10),
+            ) as response:
+                if response.status in (401, 403):
+                    raise PiKVMAuthError("Invalid credentials.")
+                response.raise_for_status()
+                return True
+        except aiohttp.ClientError as err:
+            raise PiKVMConnectionError(f"Network error rebooting system: {err}") from err
+
+    async def set_msd_state(self, connected: bool) -> bool:
+        """Toggle Virtual Media (MSD) state."""
+        # Note: PiKVM MSD api endpoints can vary by version, often /api/msd/set_state or /api/msd/connect
+        url = f"{self._host}/api/msd/set_state"
+        params = {"connected": "1" if connected else "0"}
+        try:
+            async with self._session.post(
+                url,
+                auth=self._auth,
+                params=params,
+                ssl=self._verify_ssl,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as response:
+                if response.status in (401, 403):
+                    raise PiKVMAuthError("Invalid credentials.")
+                if response.ok:
+                    return True
+                return False
+        except aiohttp.ClientError as err:
+            _LOGGER.warning(f"Error setting MSD state: {err}")
+            return False
+
+    async def set_usb_mode(self, mode: str) -> bool:
+        """Set USB/HID Mode (e.g. hid, msd, hid+msd)."""
+        url = f"{self._host}/api/hid/set_mode"
+        params = {"mode": mode}
+        try:
+            async with self._session.post(
+                url,
+                auth=self._auth,
+                params=params,
+                ssl=self._verify_ssl,
+                timeout=aiohttp.ClientTimeout(total=5),
+            ) as response:
+                if response.status in (401, 403):
+                    raise PiKVMAuthError("Invalid credentials.")
+                if response.ok:
+                    return True
+                return False
+        except aiohttp.ClientError as err:
+            _LOGGER.warning(f"Error setting USB mode: {err}")
+            return False
+

@@ -1,7 +1,7 @@
 """Constants for the PiKVM Custom Controls integration."""
 
 DOMAIN = "pikvm_custom"
-PLATFORMS = ["button", "binary_sensor", "sensor"]
+PLATFORMS = ["button", "binary_sensor", "sensor", "camera", "switch", "select"]
 
 CONF_HOST = "host"
 CONF_USERNAME = "username"

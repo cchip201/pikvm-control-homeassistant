@@ -51,6 +51,11 @@ async def async_setup_entry(
             ["info", "system", "kvmd", "version"], None,
             None, None, "mdi:information-outline"
         ),
+        # IP Address
+        PiKVMIPSensor(
+            coordinator, entry, host, "IP Address", "ip_address",
+            ["info", "system", "network", "interfaces"]
+        ),
     ]
 
     async_add_entities(sensors)
@@ -170,3 +175,35 @@ class PiKVMTimestampSensor(PiKVMSensor):
         # Calculate boot time relative to current UTC time
         boot_time = dt_util.utcnow() - timedelta(seconds=uptime_seconds)
         return boot_time
+
+class PiKVMIPSensor(PiKVMSensor):
+    """Sensor to report PiKVM IP address."""
+
+    def __init__(
+        self,
+        coordinator: PiKVMDataUpdateCoordinator,
+        entry: ConfigEntry,
+        host: str,
+        name: str,
+        unique_id_suffix: str,
+        data_path: list[str],
+    ) -> None:
+        """Initialize the IP sensor."""
+        super().__init__(coordinator, entry, host, name, unique_id_suffix, data_path, icon="mdi:ip-network")
+
+    @property
+    def native_value(self) -> str | None:
+        """Return IP Address."""
+        if not self.coordinator.data:
+            return None
+        info = self.coordinator.data.get("info", {})
+        interfaces = info.get("system", {}).get("network", {}).get("interfaces", {})
+        # Grab the first non-localhost IPv4
+        for iface, data in interfaces.items():
+            if iface == "lo":
+                continue
+            ipv4_list = data.get("ipv4", [])
+            if ipv4_list:
+                return ipv4_list[0]
+        return None
+
