@@ -5,8 +5,8 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/cchip201/pikvm-control-homeassistant",
-  "issue_tracker": "https://github.com/cchip201/pikvm-control-homeassistant/issues",
   "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/cchip201/pikvm-control-homeassistant/issues",
   "requirements": ["aiohttp>=3.8.1"],
   "version": "2.0.2"
 }
