@@ -75,6 +75,7 @@ Track sub-services and physical server states:
 | **Fan Speed** | — | `measurement` | RPM | `mdi:fan` |
 | **Boot Time** | `timestamp` | — | UTC | `mdi:clock-start` |
 | **KVMD Version** | — | — | — | `mdi:information-outline` |
+| **IP Address** | — | — | — | `mdi:ip-network` |
 
 ### Binary Sensors (`binary_sensor.py`)
 | Entity Name | Device Class | Icon | Description |
@@ -92,6 +93,24 @@ Track sub-services and physical server states:
 | :--- | :--- | :--- |
 | **Click Power Button** | Momentary Click | Simulates pressing the physical ATX power button |
 | **Click Reset Button** | Momentary Click | Simulates pressing the physical ATX reset button |
+| **Power Long Press (Hard Off)** | Long Press | Forces ATX power off |
+| **Reboot PiKVM** | System Reboot | Reboots the underlying PiKVM device (not target PC) |
+
+### Switches (`switch.py`)
+| Switch Name | Device Class | Icon | Description |
+| :--- | :--- | :--- | :--- |
+| **ATX Power** | `switch` | `mdi:power` | Tracks ATX power state and toggles power on/off_hard |
+| **Virtual Media** | `switch` | `mdi:usb-flash-drive` | Connects or disconnects the virtual Mass Storage Drive |
+
+### Selects (`select.py`)
+| Select Name | Icon | Description | Options |
+| :--- | :--- | :--- | :--- |
+| **USB HID Mode** | `mdi:usb` | Configures the USB emulation mode | `hid`, `msd`, `hid+msd`, `disabled` |
+
+### Cameras (`camera.py`)
+| Camera Name | Format | Icon | Description |
+| :--- | :--- | :--- | :--- |
+| **PiKVM Video Stream** | `mjpeg` | `mdi:video` | Live video feed from the PiKVM µStreamer |
 
 ---
 
