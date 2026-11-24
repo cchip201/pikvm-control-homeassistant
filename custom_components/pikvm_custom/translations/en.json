@@ -10,6 +10,14 @@
           "password": "Password",
           "verify_ssl": "Verify SSL Certificate"
         }
+      },
+      "reauth_confirm": {
+        "title": "Reauthenticate PiKVM",
+        "description": "Update the credentials for PiKVM at {host}.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
       }
     },
     "error": {
@@ -18,7 +26,8 @@
       "unknown": "Unexpected error occurred."
     },
     "abort": {
-      "already_configured": "Device is already configured"
+      "already_configured": "Device is already configured",
+      "reauth_successful": "Re-authentication was successful"
     }
   }
 }

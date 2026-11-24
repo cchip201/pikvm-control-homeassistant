@@ -1,5 +1,6 @@
 """Asynchronous test script for PiKVM API Client."""
 import asyncio
+import aiohttp
 import os
 import sys
 
@@ -17,7 +18,8 @@ async def test_flow() -> None:
     print("=== Testing Client against Mock Server ===")
     
     print("\n1. Initializing PiKVMClient...")
-    client = PiKVMClient(host=host, username=username, password=password)
+    session = aiohttp.ClientSession()
+    client = PiKVMClient(host=host, username=username, password=password, session=session)
 
     try:
         print("2. Checking Connection (Valid Credentials)...")
@@ -50,7 +52,7 @@ async def test_flow() -> None:
 
         # Test auth error handling
         print("\n9. Testing Client Auth Failure Handling...")
-        bad_client = PiKVMClient(host=host, username="admin", password="wrongpassword")
+        bad_client = PiKVMClient(host=host, username="admin", password="wrongpassword", session=session)
         try:
             await bad_client.check_connection()
             print("   ERROR: Connection succeeded with wrong password!")
@@ -63,7 +65,7 @@ async def test_flow() -> None:
         print(f"\n   CRITICAL FAILURE: API Client error occurred: {err}")
     finally:
         # Close the underlying aiohttp session
-        await client._session.close()
+        await session.close()
 
 if __name__ == "__main__":
     asyncio.run(test_flow())

@@ -1,50 +1,45 @@
 # PiKVM Control Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![HA_Version](https://img.shields.io/badge/Home%20Assistant-2026.3+-blue.svg?style=for-the-badge)](https://github.com/home-assistant/core)
 [![Release](https://img.shields.io/github/v/release/cchip201/pikvm-control-homeassistant?style=for-the-badge)](https://github.com/cchip201/pikvm-control-homeassistant/releases)
 
-A fully polished, advanced Home Assistant integration to monitor and control **PiKVM V3/V4** hardware ATX states, running services, temperature, fan speed, and diagnostics.
+A Home Assistant integration to monitor and control **PiKVM V3/V4** hardware ATX states, running services, temperature, fan speed, and diagnostics.
 
 ---
 
 ## Features
 
 ### 🔌 Physical ATX Control & Buttons
-Trigger real-time physical button presses on your target computer:
-*   **Power Button Click**: Performs a standard momentary power button press.
-*   **Reset Button Click**: Performs a standard momentary reset button press.
-*   **Advanced Power Actions**: Execute persistent states such as `On`, `Off` (Graceful), `Hard Off` (Force power-down), and `Hard Reset`.
+Trigger physical ATX actions on your target computer:
+*   **Power Click**: Simulates a momentary ATX power button press.
+*   **Reset Click**: Simulates a momentary ATX reset button press.
+*   **Power Long Press (Hard Off)**: Executes an immediate forced ATX power-off (`off_hard`).
 
-### 📊 Advanced Diagnostics (New in v2.0.0)
+### 📊 Diagnostics & Telemetry
 Real-time telemetry and hardware monitoring from the PiKVM KVMD API:
-*   **CPU Temperature**: Keep track of the PiKVM SOC thermal profile in degrees Celsius.
-*   **Fan Speed**: Dynamic rotation speed monitoring (RPM) to maintain hardware health.
-*   **System Uptime & Boot Time**: Calculate precise host boot timestamps and uptime duration.
-*   **KVMD Version**: Display the current running version of the PiKVM daemon.
+*   **CPU Temperature**: Reports the PiKVM SoC temperature in degrees Celsius.
+*   **Fan Speed**: Reports cooling fan rotation speed (RPM).
+*   **Boot Time**: Calculates the host boot timestamp from KVMD uptime telemetry.
+*   **KVMD Version**: Displays the running version of the PiKVM daemon.
 
 ### 🛡️ Services & Throttling Status
 Track sub-services and physical server states:
-*   **Under-voltage / Throttling Alert**: Alert when the PiKVM hardware experiences throttling due to voltage drop or thermals.
-*   **IPMI Service**: Check whether the IPMI interface is active.
-*   **Janus WebRTC Service**: Monitor the streaming gateway state.
-*   **VNC Service**: Monitor target desktop remote session availability.
-*   **Webterm Service**: Check if the embedded terminal shell service is online.
-*   **Power & HDD LEDs**: Visual indicators mirror the target system's physical front-panel LEDs.
+*   **Under-voltage / Throttling Alert**: Alerts when the PiKVM hardware experiences throttling due to voltage drop or thermals.
+*   **IPMI Service**: Checks whether the IPMI interface is active.
+*   **Janus WebRTC Service**: Monitors the streaming gateway state.
+*   **VNC Service**: Monitors target desktop remote session availability.
+*   **Webterm Service**: Checks if the embedded terminal shell service is online.
+*   **Power & HDD LEDs**: Mirrors the target system's physical front-panel Power and HDD LEDs.
 
 ---
 
 ## Installation
 
 ### Method 1: HACS (Recommended)
-1. Go to **HACS** > **Integrations** in your Home Assistant sidebar.
-2. Click the **three dots** in the top-right corner and select **Custom repositories**.
-3. Add the repository URL:
-   ```text
-   https://github.com/cchip201/pikvm-control-homeassistant
-   ```
-4. Select Category **Integration** and click **Add**.
-5. Find **PiKVM Control Home Assistant** in the store, click **Download**, and restart Home Assistant.
+1. Open **HACS** (or **Marketplace** in Home Assistant 2026.11+) in your Home Assistant sidebar.
+2. Search for **PiKVM Control Home Assistant**, click **Download**, and restart Home Assistant.
+   * *Alternative (Custom Repository)*: Click the **three dots** in the top-right corner of HACS → **Custom repositories** → add `https://github.com/cchip201/pikvm-control-homeassistant` with category **Integration** → click **Add**, then download and restart Home Assistant.
 
 ### Method 2: Manual Installation
 1. Download the latest release from the [Releases](https://github.com/cchip201/pikvm-control-homeassistant/releases) page.
@@ -90,14 +85,15 @@ Track sub-services and physical server states:
 ### Buttons (`button.py`)
 | Button Name | Action | Description |
 | :--- | :--- | :--- |
-| **Click Power Button** | Momentary Click | Simulates pressing the physical ATX power button |
-| **Click Reset Button** | Momentary Click | Simulates pressing the physical ATX reset button |
+| **Power Click** | Momentary Click (`power`) | Simulates pressing the physical ATX power button |
+| **Reset Click** | Momentary Click (`reset`) | Simulates pressing the physical ATX reset button |
+| **Power Long Press (Hard Off)** | ATX Power Action (`off_hard`) | Forces an immediate ATX power-off on the target computer |
 
 ---
 
 ## Diagnostics & Troubleshooting
 
-This integration includes support for Home Assistant local brand asset rendering (introduced in **2026.3**). Brand assets like the integration logo and icon are stored locally under the `brand/` directory inside the custom component, prioritizing local asset loading over GitHub or standard brand API proxy calls.
+This integration includes support for Home Assistant local brand asset rendering (introduced in **2026.3**). Brand assets are stored locally under `custom_components/pikvm_custom/brand/`.
 
 If you encounter issues with device connections:
 1. Ensure your PiKVM is reachable on the local network.

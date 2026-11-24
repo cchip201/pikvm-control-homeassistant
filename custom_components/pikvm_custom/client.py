@@ -5,14 +5,18 @@ import aiohttp
 
 _LOGGER = logging.getLogger(__name__)
 
+
 class PiKVMClientError(Exception):
     """Base exception for PiKVM Client errors."""
+
 
 class PiKVMAuthError(PiKVMClientError):
     """Authentication failed."""
 
+
 class PiKVMConnectionError(PiKVMClientError):
     """Connection to host failed."""
+
 
 class PiKVMClient:
     """Async API Client for PiKVM."""
@@ -22,8 +26,8 @@ class PiKVMClient:
         host: str,
         username: str,
         password: str,
+        session: aiohttp.ClientSession,
         verify_ssl: bool = False,
-        session: aiohttp.ClientSession | None = None,
     ) -> None:
         """Initialize client."""
         self._host = host.rstrip("/")
@@ -32,7 +36,7 @@ class PiKVMClient:
         self._username = username
         self._password = password
         self._verify_ssl = verify_ssl
-        self._session = session or aiohttp.ClientSession()
+        self._session = session
         self._auth = aiohttp.BasicAuth(username, password)
 
     async def check_connection(self) -> bool:
@@ -61,7 +65,7 @@ class PiKVMClient:
                 data = await response.json()
                 _LOGGER.debug("PiKVM state payload: %s", data)
                 return data.get("result", {})
-        except aiohttp.ClientError as err:
+        except (aiohttp.ClientError, TimeoutError) as err:
             raise PiKVMConnectionError(f"Network error getting state: {err}") from err
 
     async def click_button(self, button: str) -> bool:
@@ -81,7 +85,7 @@ class PiKVMClient:
                 response.raise_for_status()
                 data = await response.json()
                 return data.get("ok", False)
-        except aiohttp.ClientError as err:
+        except (aiohttp.ClientError, TimeoutError) as err:
             raise PiKVMConnectionError(f"Network error pressing {button} button: {err}") from err
 
     async def set_power_action(self, action: str) -> bool:
@@ -101,7 +105,7 @@ class PiKVMClient:
                 response.raise_for_status()
                 data = await response.json()
                 return data.get("ok", False)
-        except aiohttp.ClientError as err:
+        except (aiohttp.ClientError, TimeoutError) as err:
             raise PiKVMConnectionError(f"Network error calling power action {action}: {err}") from err
 
     async def get_system_info(self) -> dict:
@@ -122,6 +126,5 @@ class PiKVMClient:
                 data = await response.json()
                 _LOGGER.debug("PiKVM system info payload: %s", data)
                 return data.get("result", {})
-        except aiohttp.ClientError as err:
+        except (aiohttp.ClientError, TimeoutError) as err:
             raise PiKVMConnectionError(f"Network error getting system info: {err}") from err
-
